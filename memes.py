@@ -15,9 +15,13 @@ def natan_rage():
     skill = randint(1, 4)
     seconds = randint(1, 30)/10
     skills = ["Q", "W", "E"]
+    lanes = ["top", "mid", "bot"]
+
     templates = [f"MANO {champ} me deu {damage} de dano em {skill} {skills[randint(0,2)]}",
                  f"cara {champ.lower()} literalmente me deu {damage} de dano em uma ult",
                  f"MANO {champ.upper()} ME DEU {damage} DE DANO EM {skill} FUCKING {skills[randint(0,2)].upper()}",
                  f"{champ.upper()} ME DEU {damage} DE DANO EM {seconds} SEGUNDOS KKKKKKKKKKKKKK",
-                 f"{champ.upper()} ME DEU {damage} DE TRUE DAMAGE EM {seconds} SEGUNDOS?????????", ]
+                 f"{champ.upper()} ME DEU {damage} DE TRUE DAMAGE EM {seconds} SEGUNDOS?????????",
+                 f"{randint(1,14)} min de jogo e essa merda de {champ.lower()} ja ta no {lanes[randint(0,2)]}??", ]
+
     return templates[randint(0, len(templates)-1)]

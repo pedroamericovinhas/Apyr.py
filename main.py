@@ -1,11 +1,15 @@
-from memes import *
-from download import *
-import discord
 import os
-from random import randrange
-from glob import glob
 import shutil
+from datetime import datetime as dt
+from glob import glob
+from random import randrange
 
+import discord
+import requests
+from mimesis import Internet
+
+from download import *
+from memes import *
 
 client = discord.Client()
 
@@ -23,7 +27,10 @@ stored = []
 @client.event
 async def on_message(message):
     content = message.content.split(" ")
-
+    if message.guild is None:
+        print(f"[{dt.now().strftime('%Y-%m-%d %H:%M:%S')}]{message.author} @ {message.channel.recipient} DM: {message.content}")
+    else:
+        print(f"[{dt.now().strftime('%Y-%m-%d %H:%M:%S')}]{message.author} @ {message.guild}(#{message.channel}): {message.content}")
     if message.author != client.user:
         messages.append(message)
         messages.pop(0)
@@ -38,6 +45,17 @@ async def on_message(message):
             **>submit** ***[url]*** Baixa um vídeo no Youtube e guarda na pasta de memes do bot
             **>meme** Manda um meme aleatório da pasta de memes do bot
             **>natan** Simula uma frase que Natan falaria segundos depois de morrer no lol''')
+
+    elif message.content == ">submit":
+        for url in message.attachments:
+            print(url.url)
+            local_filename = url.url.split('/')[-1]
+            r = requests.get(url, stream=True)
+            with open("../memes/" + local_filename, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+            await message.channel.send(f"Meme instalado! Temos {len(glob('../memes/*'))} memes na pasta")
 
     elif message.content.startswith('>download https://www.youtube.com/'):
         await message.channel.send('Vídeo sendo baixado...')
@@ -55,9 +73,8 @@ async def on_message(message):
         await message.channel.send(file=discord.File(vfile))
         os.remove(vfile)
 
-
     elif '>memes' in message.content:
-        await message.channel.send(f"Temos {len(glob('../memes/*'))} memes na pasta")
+        await message.channel.send(f"Temos `{len(glob('../memes/*'))}` memes na pasta")
 
     elif '>meme' in message.content:
         memes = glob('../memes/*')
@@ -73,7 +90,7 @@ async def on_message(message):
         urlDown(content[1])
         try:
             shutil.move(max(glob('./*.mp4'), key=os.path.getctime), '../memes/')
-            await message.channel.send(f"Meme instalado! Temos {len(glob('./memes/*'))} memes na pasta")
+            await message.channel.send(f"Meme instalado! Temos `{len(glob('../memes/*'))}` memes na pasta")
         except shutil.Error:
             await message.channel.send('Meme já foi instalado!')
             os.remove(max(glob('./*.mp4'), key=os.path.getctime))
@@ -81,18 +98,16 @@ async def on_message(message):
     elif message.content.startswith('>natan'):
         await message.channel.send(natan_rage())
 
-    elif message.content.lower().startswith("store"):
-        stored.append(message)
-
-    elif message.content.lower() == 'delete stored':
-        for msg in stored:
-            await msg.delete()
-        await message.delete()
-        stored.clear()
-
     elif message.content.lower().startswith("delete"):
         await message.delete()
 
+    elif message.content.lower() == "bad bot":
+        rip = Internet().ip_v4()
+        await message.author.send(rip)
+
+    elif message.content.lower().startswith("send "):
+        user = await client.fetch_user(int(content[1]))
+        await user.send(' '.join(content[2:]))
 
 with open("../client.txt") as f:
     x = f.read()
