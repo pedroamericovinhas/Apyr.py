@@ -1,13 +1,34 @@
 import json
 from random import randint
 
+import discord
+
 champs = []
+games = []
 
 with open("champions.json", encoding='utf-8') as f:
     data = json.load(f)
 for i in data:
     champs.append(i["name"])
 
+with open("steamgames.json", encoding='utf-8') as f:
+    data = json.load(f)
+for i in data["applist"]["apps"]:
+    if "OST" not in i['name'].upper() and "DLC" not in i['name'].upper():
+        games.append(i)
+
+
+def lume222():
+    game = games[randint(0, len(games))]
+    name = game["name"]
+    steamid = game["appid"]
+
+    templates = [f"ou bora jogar [{name}](https://store.steampowered.com/app/{steamid})",
+                 f"nao nao bora jogar [{name}](https://store.steampowered.com/app/{steamid})",
+                 f"ENTREM NO [{name.upper()}](https://store.steampowered.com/app/{steamid}) FILHAS DA PUTA"]
+    embed = discord.Embed()
+    embed.description = templates[randint(0, len(templates)-1)]
+    return embed
 
 def natan_rage():
     damage = randint(800, 3000)

@@ -1,0 +1,13 @@
+Comandos:
+    **>download** ***[url]*** Baixa um vídeo do Youtube e manda no chat como .mp4
+    **>submit** Baixa um arquivo e guarda na pasta de memes do bot. Usos:
+        **>submit** ***[url]*** Tenta baixar o vídeo da url (vídeos do Youtube ou urls terminadas em .mp4)
+        **>submit** ***[com arquivo anexado]*** Tenta baixar o arquivo anexado (imagens / vídeos)
+        **>submit** ***[respondendo a outra mensagem]*** Tenta baixar o arquivo anexado na mensagem referenciada
+    **>meme** Manda um meme aleatório da pasta de memes do bot
+    **>memes** Mostra o tamanho da pasta de memes do bot
+    **>natan** Simula uma frase que Natan falaria segundos depois de morrer no lol
+    **>lume222** Simula Luiz chamando alguém pra jogar um jogo que ninguém ouviu falar
+    **>pin** Recria uma mensagem fixada aleatória do canal atual
+    **>ideia** ***[texto]*** Adiciona uma sugestão para o bot para a lista de sugestões
+    **>ideias** Mostra a lista de sugestões
