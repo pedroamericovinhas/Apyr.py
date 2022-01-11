@@ -1,16 +1,16 @@
+from download import *
 import os
 import shutil
 from datetime import datetime as dt
 from glob import glob
-from random import randrange
+from random import randrange, randint
 
 import discord
 import requests
 from mimesis import Internet
 
-from download import *
 from memes import *
-
+from loggers import logga
 client = discord.Client()
 
 
@@ -20,20 +20,18 @@ async def on_ready():
     print(f'друг is online [took {int((b - a) * 1000)}ms]')
 
 
-messages = ['', '']
-stored = []
-
-
 @client.event
 async def on_message(message):
+    programming = await client.fetch_channel(NC["programming"])
     content = message.content.split(" ")
-    if message.guild is None:
-        print(f"[{dt.now().strftime('%Y-%m-%d %H:%M:%S')}]{message.author} @ {message.channel.recipient} DM: {message.content}")
-    else:
-        print(f"[{dt.now().strftime('%Y-%m-%d %H:%M:%S')}]{message.author} @ {message.guild}(#{message.channel}): {message.content}")
-    if message.author != client.user:
-        messages.append(message)
-        messages.pop(0)
+
+    logga(message)
+
+    try:
+        if message.channel == programming and "github" in message.content.split('/')[-3]:
+            await message.pin()
+    except IndexError:
+        pass
 
     if message.author == client.user:
         return
@@ -47,28 +45,29 @@ async def on_message(message):
         if message.reference:
             msg = await message.channel.fetch_message(message.reference.message_id)
         for url in msg.attachments:
-            print(url.url)
-            local_filename = url.url.split('/')[-1]
+            local_filename = url.url.split('/')[-1].split(".")
             r = requests.get(url, stream=True)
-            with open("../memes/" + local_filename, 'wb') as f:
+            with open("../memes/" + local_filename[0] + str(randint(10000, 99999)) + '.' + local_filename[-1], 'wb') as f:
                 for chunk in r.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
             await message.channel.send(f"Meme instalado! Temos {len(glob('../memes/*'))} memes na pasta")
 
     elif message.content.startswith(">ideia ") or message.content.startswith(">idea "):
-        with open('./ideias.txt', 'a') as f:
+        with open('./ideias.txt', 'a', encoding="utf-8") as f:
             f.write(f"[{dt.now().strftime('%Y-%m-%d %H:%M:%S')}] {message.author}: {' '.join(content[1:])}\n")
-            await message.channel.send("nossos trabalhadores assalariados (pedro) irão tomar conta da sua sugestão :slight_smile:")
+            await message.channel.send(
+                "nossos trabalhadores assalariados (pedro) irão tomar conta da sua sugestão :slight_smile:")
 
     elif message.content.startswith(">ideias"):
         embed = discord.Embed()
-        with open('./ideias.txt', 'r') as f:
+        with open('./ideias.txt', 'r', encoding="utf-8") as f:
             embed.description = f.read()
         await message.channel.send(embed=embed)
+
     elif message.content.startswith('>download https://www.youtube.com/'):
         await message.channel.send('Vídeo sendo baixado...')
-        urlDown(content[1])
+        yt_down(content[1])
         await message.channel.send('Vídeo sendo enviado...')
         vfile = max(glob('./*.mp4'), key=os.path.getctime) or "Error"
         await message.channel.send(file=discord.File(vfile))
@@ -76,7 +75,7 @@ async def on_message(message):
 
     elif message.content.endswith('.mp4') and message.content.startswith('>download https://'):
         await message.channel.send('Vídeo sendo baixado...')
-        urlDown(content[1])
+        yt_down(content[1])
         await message.channel.send('Vídeo sendo enviado...')
         vfile = max(glob('./*.mp4'), key=os.path.getctime) or "Error"
         await message.channel.send(file=discord.File(vfile))
@@ -87,16 +86,12 @@ async def on_message(message):
 
     elif '>meme' in message.content:
         memes = glob('../memes/*')
-        if randrange(0, 10):
-            string = 'muito foda ' + randrange(4, 20) * 'k'
-        else:
-            string = 'muito foda ' + randrange(5, 9) * 'K'
-        await message.channel.send(string)
-        await message.channel.send(file=discord.File(memes[randrange(1, len(memes))]))
+        string = 'muito foda ' + randint(4, 12) * 'k' if randint(0, 10) else 'muito foda ' + randint(5, 10) * 'K'
+        await message.channel.send(file=discord.File(memes[randrange(1, len(memes))]), content=string)
 
     elif message.content.startswith('>submit '):
         await message.channel.send('Vídeo sendo baixado...')
-        urlDown(content[1])
+        yt_down(content[1])
         try:
             shutil.move(max(glob('./*.mp4'), key=os.path.getctime), '../memes/')
             await message.channel.send(f"Meme instalado! Temos `{len(glob('../memes/*'))}` memes na pasta")
@@ -105,7 +100,7 @@ async def on_message(message):
             os.remove(max(glob('./*.mp4'), key=os.path.getctime))
 
     elif message.content.startswith('>natan'):
-        await message.channel.send(natan_rage())
+        await message.channel.send(natan())
 
     elif message.content.lower().startswith("delete"):
         await message.delete()
@@ -121,7 +116,7 @@ async def on_message(message):
     elif message.content.lower().startswith(">lume222"):
         await message.channel.send(embed=lume222())
 
-    elif message.content.lower().startswith("widepeepohappy"):
+    elif message.content.lower() == "widepeepohappy":
         await message.channel.send("<:wide:901309342693859409><:peepo:901309342559653940><:happy:901309342509301801>")
         await message.delete()
 
@@ -140,7 +135,6 @@ async def on_message(message):
 
             await message.channel.send(file=discord.File(max(glob('./coisas/*'), key=os.path.getctime)), content=msg.content)
             os.remove(max(glob('./coisas/*'), key=os.path.getctime))
-
         else:
             await message.channel.send(msg.content)
 

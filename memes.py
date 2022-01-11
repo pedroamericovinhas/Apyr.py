@@ -5,6 +5,11 @@ import discord
 
 champs = []
 games = []
+global NC
+NC = {"geral": 389605206586818570,
+      "bots": 388848904281653248,
+      "programming": 729823047342620753, }
+
 
 with open("champions.json", encoding='utf-8') as f:
     data = json.load(f)
@@ -30,7 +35,8 @@ def lume222():
     embed.description = templates[randint(0, len(templates)-1)]
     return embed
 
-def natan_rage():
+
+def natan():
     damage = randint(800, 3000)
     champ = champs[randint(1, len(champs)-1)]
     skill = randint(1, 4)
