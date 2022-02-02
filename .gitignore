@@ -3,3 +3,8 @@ loggers.py
 idea/*
 __pycache__
 logs
+*.txt
+*.swp
+*.json
+apyr-js
+bible_verses
